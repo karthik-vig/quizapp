@@ -21,10 +21,9 @@ public class QuizAppController {
 
     @PostMapping("/login")
     public ResponseEntity<?> startLogin(@RequestBody Login login) {
-        if (login.getEmail() == "karthik.v@swirepay.com") {
+        if (login.getEmail().equals("karthik.v@swirepay.com")) {
             return new ResponseEntity<>("Success", HttpStatus.OK);
         } else {
-            System.out.println(login.getEmail());
             return new ResponseEntity<>("Failed", HttpStatus.UNAUTHORIZED);
         }
         // TestDTO testDto = new TestDTO("123", "karthik.v@swirepay.com");
