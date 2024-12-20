@@ -1,4 +1,4 @@
-package com.kvs.app.quizapp.dto.RequestBodies;
+package com.kvs.app.quizapp.dto;
 
 import javax.validation.constraints.NotNull;
 

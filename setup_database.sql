@@ -1,3 +1,10 @@
+create table if not exists emailotp (
+    id varchar(40) primary key,
+    email varchar not null,
+    otp integer not null,
+    createdat timestamp default current_timestamp,
+);
+
 create table if not exists users (
     id varchar(40) primary key,
     username text,

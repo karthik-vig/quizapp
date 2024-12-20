@@ -6,14 +6,18 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 // import org.springframework.web.bind.annotation.ResponseStatus;
 // import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 // import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.Random;
 import java.util.Properties;
 import java.util.Date;
@@ -26,7 +30,12 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.InternetAddress;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import com.kvs.app.quizapp.dto.RequestBodies.Login;
+import com.kvs.app.quizapp.dto.Login;
+import com.kvs.app.quizapp.dto.QuizInvite;
+import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
+import com.kvs.app.quizapp.dto.QuizTemplate;
+import com.kvs.app.quizapp.dto.QuestionTemplate.Question;
+import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
 
 
 class HandleEmail {
@@ -71,10 +80,12 @@ class HandleEmail {
     }
 }
 
+
 @RestController
 @RequestMapping("/api")
 public class QuizAppController {
-
+    
+    // login api section
     // need to clear the email key after some fixed time?
     private static volatile HashMap<String, Integer> emailOtp = new HashMap<>();
 
@@ -105,6 +116,46 @@ public class QuizAppController {
             return new ResponseEntity<>("Success", HttpStatus.OK);
         }
         return new ResponseEntity<>("Authentication Failed", HttpStatus.UNAUTHORIZED);
+    }
+
+    // the invite api section
+    @GetMapping("/invites/active") 
+    public ResponseEntity<?> getInvites(HttpSession session) {
+        // get the user's email
+        String userEmail = (String) session.getAttribute("username");
+        QuizInvite quizInvite = new QuizInvite();
+        quizInvite.setId("123" + userEmail);
+        quizInvite.setQuizName("first test quiz");
+        Vector<QuizInvite> quizInvites = new Vector<QuizInvite>();
+        quizInvites.add(quizInvite);
+        return ResponseEntity.ok(quizInvite);
+    } 
+
+    @GetMapping("/invites/active/{id}")
+    public ResponseEntity<?> getInviteDetails(@PathVariable String id, HttpSession session) {
+        // get the user's email
+        // Mock up
+        String userEmail = (String) session.getAttribute("username");
+        QuizTemplate<Question> inviteeQuizTemplate = new QuizTemplate<Question>();
+        Question question = new Question();
+        question.setQuestionType("radio");
+        question.setQuestion("what is your age?");
+        Vector<String> answers = new Vector<>();
+        answers.add("21");
+        answers.add("22");
+        answers.add("45");
+        question.setAnswerOptions(answers);
+        Vector<Question> questions = new Vector<Question>();
+        questions.add(question);
+        inviteeQuizTemplate.setTitle("First test quiz: " + id + " " + userEmail);
+        inviteeQuizTemplate.setQuestions(questions);
+        return ResponseEntity.ok(inviteeQuizTemplate);
+    }
+
+    @PostMapping("/invites/active/{id}")
+    public ResponseEntity<?> getInviteDetails(@PathVariable String id, @RequestBody QuizSubmissionAnswer quizSubmissionAnswer, HttpSession session) {
+        String userEmail = (String) session.getAttribute("username");
+        return ResponseEntity.ok(quizSubmissionAnswer);
     }
 
     @GetMapping("/test")
