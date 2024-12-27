@@ -33,6 +33,7 @@ create table if not exists submissions (
 create table if not exists quizzes (
     id varchar(40) primary key,
     userid varchar(40) not null,
+    quiztitle text not null,
     quizdata longtext not null,
     createdat timestamp default current_timestamp,
     updatedat timestamp on update current_timestamp
