@@ -34,3 +34,6 @@ build/
 
 ### Environment Variables ###
 .env
+
+### Ignore the application.properties file
+**/src/**/application.properties
