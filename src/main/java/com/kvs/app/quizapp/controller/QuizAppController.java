@@ -1,5 +1,6 @@
 package com.kvs.app.quizapp.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 // import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+// import org.springframework.web.bind.annotation.RequestParam;
 
 // import org.springframework.web.bind.annotation.ResponseStatus;
 // import org.springframework.web.bind.annotation.RequestParam;
@@ -18,9 +19,13 @@ import jakarta.servlet.http.HttpSession;
 // import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Vector;
+
+import javax.validation.Valid;
+
 import java.util.Random;
 import java.util.Properties;
 import java.util.Date;
+import java.util.List;
 import jakarta.mail.Session;
 import jakarta.mail.Message;
 import jakarta.mail.Transport;
@@ -35,7 +40,8 @@ import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
 import com.kvs.app.quizapp.dto.QuizTemplate;
 import com.kvs.app.quizapp.dto.QuestionTemplate.Question;
-import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
+import com.kvs.app.quizapp.service.InvitesSerivce;
+// import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
 
 
 class HandleEmail {
@@ -89,8 +95,15 @@ public class QuizAppController {
     // need to clear the email key after some fixed time?
     private static volatile HashMap<String, Integer> emailOtp = new HashMap<>();
 
+    private InvitesSerivce invitesSerivce;
+
+    @Autowired
+    public QuizAppController(InvitesSerivce invitesSerivce) {
+        this.invitesSerivce = invitesSerivce;
+    }
+
     @PostMapping("/login/request")
-    public ResponseEntity<?> loginRequest(@RequestBody Login login) {
+    public ResponseEntity<?> loginRequest(@Valid @RequestBody Login login) {
         // generate otp
         Random randomNumberGenerator = new Random();
         int otp = randomNumberGenerator.nextInt(100000, 999999);
@@ -104,7 +117,7 @@ public class QuizAppController {
     }
 
     @PostMapping("/login/verification")
-    public ResponseEntity<?> startLogin(@RequestBody Login login, HttpSession session) {
+    public ResponseEntity<?> startLogin(@Valid @RequestBody Login login, HttpSession session) {
         String email = login.getEmail();
         Integer userOtp = login.getOtp();
         Integer serverOtp = emailOtp.get(email);
@@ -123,12 +136,13 @@ public class QuizAppController {
     public ResponseEntity<?> getInvites(HttpSession session) {
         // get the user's email
         String userEmail = (String) session.getAttribute("username");
-        QuizInvite quizInvite = new QuizInvite();
-        quizInvite.setId("123" + userEmail);
-        quizInvite.setQuizName("first test quiz");
-        Vector<QuizInvite> quizInvites = new Vector<QuizInvite>();
-        quizInvites.add(quizInvite);
-        return ResponseEntity.ok(quizInvite);
+        List<QuizInvite> quizInvites = invitesSerivce.getActiveInvites(userEmail);
+        // QuizInvite quizInvite = new QuizInvite();
+        // quizInvite.setId("123" + userEmail);
+        // quizInvite.setQuizName("first test quiz");
+        // Vector<QuizInvite> quizInvites = new Vector<QuizInvite>();
+        // quizInvites.add(quizInvite);
+        return ResponseEntity.ok(quizInvites);
     } 
 
     @GetMapping("/invites/active/{id}")
@@ -153,7 +167,10 @@ public class QuizAppController {
     }
 
     @PostMapping("/invites/active/{id}")
-    public ResponseEntity<?> getInviteDetails(@PathVariable String id, @RequestBody QuizSubmissionAnswer quizSubmissionAnswer, HttpSession session) {
+    public ResponseEntity<?> getInviteDetails(
+        @PathVariable String id, 
+        @RequestBody QuizSubmissionAnswer quizSubmissionAnswer, 
+        HttpSession session) {
         String userEmail = (String) session.getAttribute("username");
         return ResponseEntity.ok(quizSubmissionAnswer);
     }
