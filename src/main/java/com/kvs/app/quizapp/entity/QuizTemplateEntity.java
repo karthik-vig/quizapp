@@ -2,8 +2,12 @@ package com.kvs.app.quizapp.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 
@@ -20,12 +24,15 @@ public class QuizTemplateEntity {
     @Column( name = "quiztemplatetitle")
     private String quiztemplatetitle;
 
+    @Lob
     @Column( name = "quiztemplate")
     private String quiztemplate;
 
-    @Column( name = "createdat")
+    @CreationTimestamp
+    @Column( name = "createdat", updatable = false)
     private LocalDateTime createdat;
 
+    @UpdateTimestamp
     @Column( name = "updatedat")
     private LocalDateTime updatedat;
 

@@ -2,6 +2,9 @@ package com.kvs.app.quizapp.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -20,9 +23,11 @@ public class UsersEntity {
     @Column( name = "email")
     private String email;
 
-    @Column( name = "createdat")
+    @CreationTimestamp
+    @Column( name = "createdat", updatable = false)
     private LocalDateTime createdat;
 
+    @UpdateTimestamp
     @Column( name = "updatedat")
     private LocalDateTime updatedat;
 

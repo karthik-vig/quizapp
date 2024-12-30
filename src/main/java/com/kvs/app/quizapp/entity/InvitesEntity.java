@@ -6,6 +6,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity
 @Table( name = "invites" )
 public class InvitesEntity {
@@ -23,9 +26,11 @@ public class InvitesEntity {
     @Column( name = "invitestatus")
     private boolean invitestatus;
 
-    @Column( name = "createdat")
+    @CreationTimestamp
+    @Column( name = "createdat", updatable = false)
     private LocalDateTime createdat;
 
+    @UpdateTimestamp
     @Column( name = "updatedat")
     private LocalDateTime updatedat;
 
