@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 // import org.springframework.web.bind.annotation.RequestParam;
@@ -116,6 +118,45 @@ public class QuizAppController {
             return new ResponseEntity<>(status, HttpStatus.NOT_ACCEPTABLE);
         }
         return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/quiz-template/{quizTemplateId}")
+    public ResponseEntity<?> getQuizTemplate(
+        @PathVariable(name = "quizTemplateId") String quizTemplateId,
+        HttpSession session
+    ) {
+        // get the user's email id
+        String userEmail = (String) session.getAttribute("username");
+        // service returns the dto of the request json of the respective quizTemplateId
+        return ResponseEntity.ok(this.quizTemplateService.getQuizTemplate(userEmail, quizTemplateId));
+    }
+
+    @PutMapping("/quiz-template/{quizTemplateId}")
+    public ResponseEntity<?> modifyQuizTemplate(
+        @PathVariable(name = "quizTemplateId") String quizTemplateId,
+        @RequestBody QuizTemplate<QuestionAndAnswer> quizTemplate,
+        HttpSession session
+    ) {
+        // get the user's email from session
+        String userEmail = (String) session.getAttribute("username");
+        // use the quiz template service to replace the existing json data and quiz template title
+        String status = this.quizTemplateService.modifyQuizTemplate(userEmail, quizTemplateId, quizTemplate);
+        if (status.equals("Fail")) {
+            return new ResponseEntity<>(status, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(status);
+    }
+
+    @DeleteMapping("/quiz-template/{quizTemplateId}")
+    public ResponseEntity<?> deleteQuizTemplate(
+        @PathVariable(name = "quizTemplateId") String quizTemplateId,
+        HttpSession session
+    ) {
+        // get the user's email from session
+        String userEmail = (String) session.getAttribute("username");
+        // the quiz template service needs to delete the row for the respective id
+        
+        return ResponseEntity.ok(null);
     }
 
     // the invite api section

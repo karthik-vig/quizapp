@@ -18,6 +18,8 @@ import java.util.Vector;
 import java.util.UUID;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 
 @Service
 public class QuizTemplateService {
@@ -65,6 +67,51 @@ public class QuizTemplateService {
         quizTemplateEntity.setQuiztemplate(quizTemplateJson);
         this.quizTemplateRepository.save(quizTemplateEntity);
         return "Success";
+    }
+
+    public QuizTemplate<QuestionAndAnswer> getQuizTemplate(
+        String userEmail, 
+        String quizTemplateId
+        ) {
+        // get the users table row using email to get the userid
+        UsersEntity usersRow = this.usersRepository.findByEmail(userEmail);
+        if (usersRow == null) return null;
+        // get the quiz json
+        QuizTemplateEntity quizTemplateRow = this.quizTemplateRepository.findByQuizTemplateId(quizTemplateId);
+        // parse the json into dto
+        // QuizTemplate<QuestionAndAnswer> quizTemplate = new QuizTemplate<>();
+        Type type = new TypeToken<QuizTemplate<QuestionAndAnswer>>(){}.getType();
+        QuizTemplate<QuestionAndAnswer> quizTemplate = this.gson.fromJson(quizTemplateRow.getQuiztemplate(), type);
+        return quizTemplate;
+    }
+
+    public String modifyQuizTemplate(
+        String userEmail,
+        String quizTemplateId,
+        QuizTemplate<QuestionAndAnswer> quizTemplate
+    ) {
+        // get the users table row using email to get the userid
+        UsersEntity usersRow = this.usersRepository.findByEmail(userEmail);
+        if (usersRow == null) return "Fail";
+        // convert quiz template into json
+        String quizTemplateJson = this.gson.toJson(quizTemplate);
+        // update the title
+        // this.quizTemplateRepository.updateQuizTemplateTitle(quizTemplate.getTitle(), quizTemplateId);
+        // update the quizTemplate json data
+        // this.quizTemplateRepository.updateQuizTemplateJson(quizTemplateJson, quizTemplateId);
+        return "Success";
+    }
+
+    public String deleteQuizTemplate(
+        String userEmail,
+        String quizTemplateId
+    ) {
+        // get the users table row using email to get the userid
+        UsersEntity usersRow = this.usersRepository.findByEmail(userEmail);
+        if (usersRow == null) return "Fail";
+        // delete the row associated with the id
+        this.quizTemplateRepository.deleteById(quizTemplateId);
+        return "Sucess";
     }
 
 }
