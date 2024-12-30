@@ -2,6 +2,7 @@ package com.kvs.app.quizapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 // import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +30,12 @@ import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
 import com.kvs.app.quizapp.dto.QuizTemplate;
 import com.kvs.app.quizapp.dto.QuestionTemplate.Question;
+import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
 import com.kvs.app.quizapp.helpers.EmailSender;
+import com.kvs.app.quizapp.service.HandleUsers;
 import com.kvs.app.quizapp.service.InvitesSerivce;
 // import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
+import com.kvs.app.quizapp.service.QuizTemplateService;
 
 
 @RestController
@@ -43,10 +47,18 @@ public class QuizAppController {
     private static volatile HashMap<String, Integer> emailOtp = new HashMap<>();
 
     private InvitesSerivce invitesSerivce;
+    private QuizTemplateService quizTemplateService;
+    private HandleUsers handleUsers;
 
     @Autowired
-    public QuizAppController(InvitesSerivce invitesSerivce) {
+    public QuizAppController(
+        InvitesSerivce invitesSerivce,
+        QuizTemplateService quizTemplateService,
+        HandleUsers handleUsers
+        ) {
         this.invitesSerivce = invitesSerivce;
+        this.quizTemplateService = quizTemplateService;
+        this.handleUsers = handleUsers;
     }
 
     @PostMapping("/login/request")
@@ -64,7 +76,10 @@ public class QuizAppController {
     }
 
     @PostMapping("/login/verification")
-    public ResponseEntity<?> startLogin(@Valid @RequestBody Login login, HttpSession session) {
+    public ResponseEntity<?> startLogin(
+        @Valid @RequestBody Login login, 
+        HttpSession session
+        ) {
         String email = login.getEmail();
         Integer userOtp = login.getOtp();
         Integer serverOtp = emailOtp.get(email);
@@ -73,9 +88,34 @@ public class QuizAppController {
             userOtp.equals(serverOtp)) {
             session.setAttribute("username", email);
             emailOtp.remove(email);
+            this.handleUsers.createUserIfNotExist(email);
             return new ResponseEntity<>("Success", HttpStatus.OK);
         }
         return new ResponseEntity<>("Authentication Failed", HttpStatus.UNAUTHORIZED);
+    }
+
+    // the quiz template api section
+    @GetMapping("/quiz-template")
+    public ResponseEntity<?> getQuizTemplates(HttpSession session) {
+        // get the email of the user using the session info.
+        String userEmail = (String) session.getAttribute("username");
+        // service needs to query and get list of all quiz template id and name and return it as a dto
+        // return the List<dto>
+        return ResponseEntity.ok(quizTemplateService.getQuizTemplates(userEmail));
+    }
+
+    @PostMapping("/quiz-template")
+    public ResponseEntity<?> createNewQuizTemplate(
+        @RequestBody QuizTemplate<QuestionAndAnswer> quizTemplate,
+        HttpSession session
+    ) {
+        String userEmail = (String) session.getAttribute("username");
+        System.out.println("the user's email when creating quiz template is: " + userEmail);
+        String status = this.quizTemplateService.createNewQuizTemplate(quizTemplate, userEmail);
+        if (status.equals("Fail")) {
+            return new ResponseEntity<>(status, HttpStatus.NOT_ACCEPTABLE);
+        }
+        return ResponseEntity.ok(status);
     }
 
     // the invite api section
@@ -84,17 +124,18 @@ public class QuizAppController {
         // get the user's email
         String userEmail = (String) session.getAttribute("username");
         List<QuizInvite> quizInvites = invitesSerivce.getActiveInvites(userEmail);
-        // QuizInvite quizInvite = new QuizInvite();
-        // quizInvite.setId("123" + userEmail);
-        // quizInvite.setQuizName("first test quiz");
-        // Vector<QuizInvite> quizInvites = new Vector<QuizInvite>();
-        // quizInvites.add(quizInvite);
         return ResponseEntity.ok(quizInvites);
     } 
 
-    @GetMapping("/invites/active/{id}")
-    public ResponseEntity<?> getInviteDetails(@PathVariable String id, HttpSession session) {
-        // get the user's email
+    @GetMapping("/invites/active/{inviteId}")
+    public ResponseEntity<?> getInviteDetails(
+        @PathVariable String inviteId, 
+        HttpSession session
+        ) {
+        // get the user's email using the session info.
+        // get the inviteid of the active invite from the url path
+        // get the dto for the quiz (service needs to get the string json from database and parse it into dto)
+        // return the dto
         // Mock up
         String userEmail = (String) session.getAttribute("username");
         QuizTemplate<Question> inviteeQuizTemplate = new QuizTemplate<Question>();
@@ -108,16 +149,21 @@ public class QuizAppController {
         question.setAnswerOptions(answers);
         Vector<Question> questions = new Vector<Question>();
         questions.add(question);
-        inviteeQuizTemplate.setTitle("First test quiz: " + id + " " + userEmail);
+        inviteeQuizTemplate.setTitle("First test quiz: " + inviteId + " " + userEmail);
         inviteeQuizTemplate.setQuestions(questions);
         return ResponseEntity.ok(inviteeQuizTemplate);
     }
 
-    @PostMapping("/invites/active/{id}")
+    @PostMapping("/invites/active/{inviteId}")
     public ResponseEntity<?> getInviteDetails(
-        @PathVariable String id, 
+        @PathVariable String inviteId, 
         @RequestBody QuizSubmissionAnswer quizSubmissionAnswer, 
         HttpSession session) {
+        // Get the user's email from session info.
+        // Get the invite id
+        // Get the request body as dto
+        // give the dto to service (queries the userid from the users table using the email from the session info., then it converts the dto to string json and stores it in the submissions table)
+        // return a sucess message and status code
         String userEmail = (String) session.getAttribute("username");
         return ResponseEntity.ok(quizSubmissionAnswer);
     }

@@ -20,6 +20,8 @@ public class InvitesEntity {
     @Column( name = "quizid")
     private String quizid;
 
+    @Column( name = "invitestatus")
+    private boolean invitestatus;
 
     @Column( name = "createdat")
     private LocalDateTime createdat;
@@ -49,6 +51,14 @@ public class InvitesEntity {
 
     public void setQuizid(String quizid) {
         this.quizid = quizid;
+    }
+
+    public boolean getInvitestatus() {
+        return invitestatus;
+    }
+
+    public void setInvitestatus(boolean invitestatus) {
+        this.invitestatus = invitestatus;
     }
 
     public LocalDateTime getCreatedat() {

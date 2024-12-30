@@ -17,6 +17,9 @@ public class QuizTemplateEntity {
     @Column( name = "userid")
     private String userid;
 
+    @Column( name = "quiztemplatetitle")
+    private String quiztemplatetitle;
+
     @Column( name = "quiztemplate")
     private String quiztemplate;
 
@@ -40,6 +43,14 @@ public class QuizTemplateEntity {
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public String getQuiztemplatetitle() {
+        return quiztemplatetitle;
+    }
+
+    public void setQuiztemplatetitle(String quiztemplatetitle) {
+        this.quiztemplatetitle = quiztemplatetitle;
     }
 
     public String getQuiztemplate() {
