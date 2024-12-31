@@ -190,6 +190,7 @@ public class QuizAppController {
         String userEmail = (String) session.getAttribute("username");
         // the service needs to create the quiz in the quiz table, as well as put them in 
         // the invites table
+        quizService.createQuiz(userEmail, newQuiz);
         return ResponseEntity.ok(null);
     }
 
