@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,13 +28,16 @@ import javax.validation.Valid;
 import java.util.Random;
 import java.util.List;
 
+import com.kvs.app.quizapp.dto.Contacts;
 import com.kvs.app.quizapp.dto.Login;
+import com.kvs.app.quizapp.dto.NewContact;
 import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
 import com.kvs.app.quizapp.dto.QuizTemplate;
 import com.kvs.app.quizapp.dto.QuestionTemplate.Question;
 import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
 import com.kvs.app.quizapp.helpers.EmailSender;
+import com.kvs.app.quizapp.service.ContactsService;
 import com.kvs.app.quizapp.service.HandleUsers;
 import com.kvs.app.quizapp.service.InvitesSerivce;
 // import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
@@ -51,16 +55,19 @@ public class QuizAppController {
     private InvitesSerivce invitesSerivce;
     private QuizTemplateService quizTemplateService;
     private HandleUsers handleUsers;
+    private ContactsService contactsService;
 
     @Autowired
     public QuizAppController(
         InvitesSerivce invitesSerivce,
         QuizTemplateService quizTemplateService,
-        HandleUsers handleUsers
+        HandleUsers handleUsers,
+        ContactsService contactsService
         ) {
         this.invitesSerivce = invitesSerivce;
         this.quizTemplateService = quizTemplateService;
         this.handleUsers = handleUsers;
+        this.contactsService = contactsService;
     }
 
     @PostMapping("/login/request")
@@ -155,8 +162,73 @@ public class QuizAppController {
         // get the user's email from session
         String userEmail = (String) session.getAttribute("username");
         // the quiz template service needs to delete the row for the respective id
-        
-        return ResponseEntity.ok(null);
+        String status = this.quizTemplateService.deleteQuizTemplate(userEmail, quizTemplateId);
+        if (status.equals("Fail")) {
+            return new ResponseEntity<>("Fail", HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok("Success");
+    }
+
+    // contacts api section
+    @GetMapping("/contacts")
+    public ResponseEntity<?> getContacts(HttpSession session) {
+        // get the user's email
+        String userEmail = (String) session.getAttribute("username");
+        // service to fetch all the contacts the user has
+        // the service uses uses the useremail to get the userid
+        // then uses the userid to fetch all the contacts and return it
+        List<Contacts> contacts = this.contactsService.getAllContacts(userEmail);
+        return ResponseEntity.ok(contacts);
+    }
+
+    @PostMapping("/contacts")
+    public ResponseEntity<?> createNewContact(
+        @RequestBody NewContact newContact,
+        HttpSession session
+    ) {
+        // get the user's email
+        String userEmail = (String) session.getAttribute("username");
+        // the service creates a new contacts entry in the contacts table for the user
+        // return success or fail status
+        String status = this.contactsService.createNewContact(userEmail, newContact);
+        if (status == "Fail") {
+            return new ResponseEntity<>("Fail", HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok("Success");
+    }
+
+    @PutMapping("/contacts/{contactId}")
+    public ResponseEntity<?> modifyContacts(
+        @PathVariable String contactId,
+        @RequestBody NewContact newContact,
+        HttpSession session
+    ) {
+        // get the user's email
+        String userEmail = (String) session.getAttribute("username");
+        // the service needs to get the contactId and ensure it belongs to the 
+        // user requesting it; then replace the existing one with one given by user
+        // the process it similar to creating a new contact
+        String status = contactsService.modifyContact(userEmail, newContact, contactId);
+        if (status.equals("Fail")) {
+            return new ResponseEntity<>("Fail", HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok("Success");
+    }
+
+    @DeleteMapping("/contacts/{contactId}")
+    public ResponseEntity<?> deleteContact(
+        @PathVariable String contactId,
+        HttpSession session
+    ) {
+        // get the user's email
+        String userEmail = (String) session.getAttribute("username");
+        // service will check if the contact id belongs to the user
+        // and then delete the entry from the table
+        String status = contactsService.deleteContact(userEmail, contactId);
+        if (status.equals("Fail")) {
+            return new ResponseEntity<>("Fail", HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok("Success");
     }
 
     // the invite api section
@@ -166,7 +238,7 @@ public class QuizAppController {
         String userEmail = (String) session.getAttribute("username");
         List<QuizInvite> quizInvites = invitesSerivce.getActiveInvites(userEmail);
         return ResponseEntity.ok(quizInvites);
-    } 
+    }
 
     @GetMapping("/invites/active/{inviteId}")
     public ResponseEntity<?> getInviteDetails(

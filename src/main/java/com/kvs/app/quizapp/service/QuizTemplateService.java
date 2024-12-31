@@ -96,9 +96,12 @@ public class QuizTemplateService {
         // convert quiz template into json
         String quizTemplateJson = this.gson.toJson(quizTemplate);
         // update the title
-        // this.quizTemplateRepository.updateQuizTemplateTitle(quizTemplate.getTitle(), quizTemplateId);
+        int quizTitlesUpdated = this.quizTemplateRepository.updateQuizTemplateTitle(quizTemplate.getTitle(), quizTemplateId);
         // update the quizTemplate json data
-        // this.quizTemplateRepository.updateQuizTemplateJson(quizTemplateJson, quizTemplateId);
+        int quizTemplateJsonUpdated = this.quizTemplateRepository.updateQuizTemplateJson(quizTemplateJson, quizTemplateId);
+        if (quizTitlesUpdated != 1 && quizTemplateJsonUpdated != 1) {
+            return "Fail";
+        }
         return "Success";
     }
 
@@ -110,8 +113,10 @@ public class QuizTemplateService {
         UsersEntity usersRow = this.usersRepository.findByEmail(userEmail);
         if (usersRow == null) return "Fail";
         // delete the row associated with the id
-        this.quizTemplateRepository.deleteById(quizTemplateId);
-        return "Sucess";
+        int rowsDeleted = this.quizTemplateRepository.deleteByQuizTemplateIdAndUserId(quizTemplateId, usersRow.getId());
+        if (rowsDeleted != 1)
+            return "Fail";
+        return "Success";
     }
 
 }
