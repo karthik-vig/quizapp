@@ -9,9 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import com.kvs.app.quizapp.entity.QuizzesEntity;
 
+import java.util.List;
+
 @Repository
 public interface QuizzesRepository extends JpaRepository<QuizzesEntity, String> {  
 
     @Query("SELECT q FROM QuizzesEntity q WHERE q.id = :id")
     QuizzesEntity findByQuizid(@Param("id") String id);
+
+    @Query("SELECT q FROM QuizzesEntity q WHERE q.userid = :userId")
+    List<QuizzesEntity> findByUserId(@Param("userId") String userId);
 }

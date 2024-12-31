@@ -2,14 +2,10 @@ package com.kvs.app.quizapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-// import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,6 +27,7 @@ import java.util.List;
 import com.kvs.app.quizapp.dto.Contacts;
 import com.kvs.app.quizapp.dto.Login;
 import com.kvs.app.quizapp.dto.NewContact;
+import com.kvs.app.quizapp.dto.NewQuiz;
 import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
 import com.kvs.app.quizapp.dto.QuizTemplate;
@@ -40,6 +37,7 @@ import com.kvs.app.quizapp.helpers.EmailSender;
 import com.kvs.app.quizapp.service.ContactsService;
 import com.kvs.app.quizapp.service.HandleUsers;
 import com.kvs.app.quizapp.service.InvitesSerivce;
+import com.kvs.app.quizapp.service.QuizService;
 // import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
 import com.kvs.app.quizapp.service.QuizTemplateService;
 
@@ -56,18 +54,21 @@ public class QuizAppController {
     private QuizTemplateService quizTemplateService;
     private HandleUsers handleUsers;
     private ContactsService contactsService;
+    private QuizService quizService;
 
     @Autowired
     public QuizAppController(
         InvitesSerivce invitesSerivce,
         QuizTemplateService quizTemplateService,
         HandleUsers handleUsers,
-        ContactsService contactsService
+        ContactsService contactsService,
+        QuizService quizService
         ) {
         this.invitesSerivce = invitesSerivce;
         this.quizTemplateService = quizTemplateService;
         this.handleUsers = handleUsers;
         this.contactsService = contactsService;
+        this.quizService = quizService;
     }
 
     @PostMapping("/login/request")
@@ -167,6 +168,29 @@ public class QuizAppController {
             return new ResponseEntity<>("Fail", HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok("Success");
+    }
+
+    // create quiz section
+    @GetMapping("/quiz")
+    public ResponseEntity<?> getAllQuiz(
+        HttpSession session
+    ) {
+        // get the user's email from session
+        String userEmail = (String) session.getAttribute("username");
+        // the service fetches all the quiz's id and title and returns it
+        return ResponseEntity.ok(quizService.getAllQuiz(userEmail));
+    }
+
+    @PostMapping("/quiz")
+    public ResponseEntity<?> createQuiz(
+        @RequestBody NewQuiz newQuiz,
+        HttpSession session
+    ) {
+        // get the user's email from session
+        String userEmail = (String) session.getAttribute("username");
+        // the service needs to create the quiz in the quiz table, as well as put them in 
+        // the invites table
+        return ResponseEntity.ok(null);
     }
 
     // contacts api section
