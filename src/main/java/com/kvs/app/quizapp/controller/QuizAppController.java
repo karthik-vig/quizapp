@@ -216,8 +216,11 @@ public class QuizAppController {
         // the service creates a new contacts entry in the contacts table for the user
         // return success or fail status
         String status = this.contactsService.createNewContact(userEmail, newContact);
-        if (status == "Fail") {
-            return new ResponseEntity<>("Fail", HttpStatus.BAD_REQUEST);
+        switch(status) {
+            case "Duplicate":
+                return new ResponseEntity<>(status, HttpStatus.BAD_REQUEST);
+            case "Fail":
+                return new ResponseEntity<>(status, HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok("Success");
     }

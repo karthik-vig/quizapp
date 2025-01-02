@@ -64,12 +64,15 @@ public class ContactsService {
         // if yes then fetch the id; if not insert the contact into
         // the table and get the id
         String relatedUserId = this.createUserIfNotExist(newContact);
+        // check if this contact would be a duplicate
+        ContactsEntity existingContactsRow = contactsRepository.findByRelatedUserId(relatedUserId, usersRow.getId());
+        if (existingContactsRow != null) return "Duplicate";
         ContactsEntity contactsEntity = new ContactsEntity();
         String uuid = UUID.randomUUID().toString();
         contactsEntity.setId(uuid);
         contactsEntity.setUserid(usersRow.getId());
         contactsEntity.setRelateduserid(relatedUserId);
-        this.contactsRepository.save(contactsEntity);
+        contactsRepository.save(contactsEntity);
         return "Success";
     }
 

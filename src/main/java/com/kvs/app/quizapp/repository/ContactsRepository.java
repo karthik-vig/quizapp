@@ -32,4 +32,7 @@ public interface ContactsRepository extends JpaRepository<ContactsEntity, String
     @Query("DELETE FROM ContactsEntity c WHERE c.id = :contactId AND c.userid = :userId")
     int deleteContactByIdAndUserId(@Param("contactId") String contactId, @Param("userId") String userId);
 
+    @Query("SELECT c FROM ContactsEntity c WHERE c.relateduserid = :relatedUserId AND c.userid = :userId")
+    ContactsEntity findByRelatedUserId(@Param("relatedUserId") String relatedUserId, @Param("userId") String userId);
+
 }
