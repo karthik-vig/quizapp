@@ -12,10 +12,16 @@ import com.google.gson.Gson;
 // import com.kvs.app.quizapp.mapper.ActiveInvitesMapper;
 import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
+import com.kvs.app.quizapp.dto.QuizTemplate;
+import com.kvs.app.quizapp.dto.QuestionTemplate.Question;
+import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
+import com.google.gson.reflect.TypeToken;
 
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 // import java.util.Optional;
@@ -65,6 +71,42 @@ public class InvitesSerivce {
         return quizInvites;
     }
 
+    public QuizTemplate<Question> getInviteDetails(
+        String inviteId,
+        String userEmail
+    ) {
+        QuizTemplate<Question> inviteeQuizTemplate = new QuizTemplate<Question>();
+        Vector<Question> questions = new Vector<Question>();
+        // get the user's id
+        UsersEntity userRow = this.usersRepository.findByEmail(userEmail);
+        if (userRow == null) {
+            return null;
+        }
+        // convert the invite id into quiz id
+        String quizId = this.invitesRepository.getQuizIdByInviteId(inviteId);
+        if (quizId == null) {
+            return null;
+        }
+        // get the json data of the quiz
+        QuizzesEntity quizRow = this.quizzesRepository.findByQuizid(quizId);
+        if (quizRow == null) {
+            return null;
+        }
+        Type type = new TypeToken<QuizTemplate<QuestionAndAnswer>>(){}.getType();
+        QuizTemplate<QuestionAndAnswer> quizTemplate = gson.fromJson(quizRow.getQuizdata(), type);
+        // setup the values for quiz template
+        inviteeQuizTemplate.setTitle(quizTemplate.getTitle());
+        for (QuestionAndAnswer questionAndAnswer : quizTemplate.getQuestions()) {
+            Question question = new Question();
+            question.setQuestionType(questionAndAnswer.getQuestionType());
+            question.setQuestion(questionAndAnswer.getQuestion());
+            question.setAnswerOptions(questionAndAnswer.getAnswerOptions());
+            questions.add(question);
+        }        
+        inviteeQuizTemplate.setQuestions(questions);
+        return inviteeQuizTemplate;
+    }
+
     public String submiteQuizAnswers(
         String userEmail,
         String inviteId,
@@ -86,7 +128,7 @@ public class InvitesSerivce {
         submissionsEntity.setId(UUID.randomUUID().toString());
         submissionsEntity.setUserid(userRow.getId());
         submissionsEntity.setQuizid(quizId);
-        submissionsEntity.setQuizanswer(this.gson.toJson(submissionsEntity));
+        submissionsEntity.setQuizanswer(this.gson.toJson(quizSubmissionAnswer));
         // save in the table
         this.submissionsRepository.save(submissionsEntity);
         return "temp";

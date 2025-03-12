@@ -1,9 +1,9 @@
 package com.kvs.app.quizapp.controller;
 
 import java.util.List;
-import java.util.Vector;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,19 +53,10 @@ public class InviteController {
         // return the dto
         // Mock up
         String userEmail = (String) session.getAttribute("username");
-        QuizTemplate<Question> inviteeQuizTemplate = new QuizTemplate<Question>();
-        Question question = new Question();
-        question.setQuestionType("radio");
-        question.setQuestion("what is your age?");
-        Vector<String> answers = new Vector<>();
-        answers.add("21");
-        answers.add("22");
-        answers.add("45");
-        question.setAnswerOptions(answers);
-        Vector<Question> questions = new Vector<Question>();
-        questions.add(question);
-        inviteeQuizTemplate.setTitle("First test quiz: " + inviteId + " " + userEmail);
-        inviteeQuizTemplate.setQuestions(questions);
+        QuizTemplate<Question> inviteeQuizTemplate = this.invitesSerivce.getInviteDetails(inviteId, userEmail);
+        if (inviteeQuizTemplate == null) {
+            return new ResponseEntity<>("Error", HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(inviteeQuizTemplate);
     }
 
