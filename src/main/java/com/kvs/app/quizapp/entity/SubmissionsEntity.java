@@ -23,8 +23,8 @@ public class SubmissionsEntity {
     @Column( name = "quizid")
     private String quizid;
 
-    @Column( name = "quizanswer")
-    private String quizanswer;
+    @Column( name = "quizanswers")
+    private String quizanswers;
 
     @CreationTimestamp
     @Column( name = "createdat", updatable = false)
@@ -58,12 +58,12 @@ public class SubmissionsEntity {
         this.quizid = quizid;
     }
 
-    public String getQuizanswer() {
-        return quizanswer;
+    public String getQuizanswers() {
+        return quizanswers;
     }
 
-    public void setQuizanswer(String quizanswer) {
-        this.quizanswer = quizanswer;
+    public void setQuizanswers(String quizanswer) {
+        this.quizanswers = quizanswer;
     }
 
     public LocalDateTime getCreatedat() {

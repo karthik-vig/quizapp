@@ -7,11 +7,11 @@ public class QuizSubmissionAnswer {
     @NotNull
     private Vector<Vector<Integer>> answers;
 
-    public Vector<Vector<Integer>> getValue() {
+    public Vector<Vector<Integer>> getAnswers() {
         return this.answers;
     }
 
-    public void setValue(Vector<Vector<Integer>> answers) {
+    public void setAnswers(Vector<Vector<Integer>> answers) {
         this.answers = answers;
     }
     

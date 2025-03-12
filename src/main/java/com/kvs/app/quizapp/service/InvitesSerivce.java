@@ -128,9 +128,9 @@ public class InvitesSerivce {
         submissionsEntity.setId(UUID.randomUUID().toString());
         submissionsEntity.setUserid(userRow.getId());
         submissionsEntity.setQuizid(quizId);
-        submissionsEntity.setQuizanswer(this.gson.toJson(quizSubmissionAnswer));
+        submissionsEntity.setQuizanswers(this.gson.toJson(quizSubmissionAnswer));
         // save in the table
         this.submissionsRepository.save(submissionsEntity);
-        return "temp";
+        return "Success";
     }
 }
