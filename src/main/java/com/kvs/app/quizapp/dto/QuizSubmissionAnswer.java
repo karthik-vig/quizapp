@@ -5,13 +5,13 @@ import java.util.Vector;
 
 public class QuizSubmissionAnswer {
     @NotNull
-    private Vector<Integer> answers;
+    private Vector<Vector<Integer>> answers;
 
-    public Vector<Integer> getValue() {
+    public Vector<Vector<Integer>> getValue() {
         return this.answers;
     }
 
-    public void setValue(Vector<Integer> answers) {
+    public void setValue(Vector<Vector<Integer>> answers) {
         this.answers = answers;
     }
     

@@ -14,4 +14,7 @@ public interface InvitesRepository extends JpaRepository<InvitesEntity, String> 
 
     @Query("SELECT i FROM InvitesEntity i WHERE i.userid = :userid")
     List<InvitesEntity> findByUserid(@Param("userid") String userid);
+
+    @Query("SELECT i.quizid FROM InvitesEntity i WHERE i.id = :inviteid")
+    String getQuizIdByInviteId(@Param("inviteid") String inviteId);
 }

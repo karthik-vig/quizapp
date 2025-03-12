@@ -80,7 +80,12 @@ public class InviteController {
         // give the dto to service (queries the userid from the users table using the email from the session info., then it converts the dto to string json and stores it in the submissions table)
         // return a sucess message and status code
         String userEmail = (String) session.getAttribute("username");
-        return ResponseEntity.ok(quizSubmissionAnswer);
+        String status = this.invitesSerivce.submiteQuizAnswers(
+                                                                userEmail, 
+                                                                inviteId, 
+                                                                quizSubmissionAnswer
+                                                            );
+        return ResponseEntity.ok(status);
     }
     
 }
