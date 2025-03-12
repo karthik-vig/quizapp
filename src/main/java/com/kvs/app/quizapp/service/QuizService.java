@@ -64,6 +64,7 @@ public class QuizService {
         String uuid = UUID.randomUUID().toString();
         quizzesEntity.setId(uuid);
         quizzesEntity.setQuiztitle(newQuiz.getQuizTitle());
+        quizzesEntity.setUserid(usersRow.getId());
         quizzesEntity.setQuizdata(quizTemplateEntity.getQuiztemplate());
         quizzesRepository.save(quizzesEntity);
         // put entry in the invites table too
