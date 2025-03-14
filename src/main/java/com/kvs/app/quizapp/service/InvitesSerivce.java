@@ -4,11 +4,15 @@ import com.kvs.app.quizapp.repository.InvitesRepository;
 import com.kvs.app.quizapp.repository.QuizzesRepository;
 import com.kvs.app.quizapp.repository.SubmissionsRepository;
 import com.kvs.app.quizapp.repository.UsersRepository;
+
+import jakarta.persistence.Tuple;
+
 import com.kvs.app.quizapp.entity.InvitesEntity;
 import com.kvs.app.quizapp.entity.QuizzesEntity;
 import com.kvs.app.quizapp.entity.SubmissionsEntity;
 import com.kvs.app.quizapp.entity.UsersEntity;
 import com.google.gson.Gson;
+import com.kvs.app.quizapp.dto.CompletedQuizzes;
 // import com.kvs.app.quizapp.mapper.ActiveInvitesMapper;
 import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
@@ -132,5 +136,25 @@ public class InvitesSerivce {
         // save in the table
         this.submissionsRepository.save(submissionsEntity);
         return "Success";
+    }
+
+    public List<CompletedQuizzes> getCompletedQuizzes(
+        String userEmail
+    ) {
+        List<CompletedQuizzes> completedQuizzes = new Vector<CompletedQuizzes>();
+        UsersEntity userRow = this.usersRepository.findByEmail(userEmail);
+        if (userRow == null) {
+            return completedQuizzes;
+        }
+        // get the quiz id from the submissions
+        List<Tuple> results = this.submissionsRepository.getQuizIdByUserId(userRow.getId());
+        for (Tuple result : results) {
+            CompletedQuizzes completedQuiz = new CompletedQuizzes();
+            completedQuiz.setId((String) result.get(0));
+            completedQuiz.setQuizTitle((String) result.get(1));
+            completedQuizzes.add(completedQuiz);
+        }
+        // use the quiz id and get the quiz title from quizzes table
+        return completedQuizzes;
     }
 }

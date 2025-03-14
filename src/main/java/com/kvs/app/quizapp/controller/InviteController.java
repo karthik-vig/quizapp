@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kvs.app.quizapp.dto.CompletedQuizzes;
 import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
 import com.kvs.app.quizapp.dto.QuizTemplate;
@@ -46,7 +47,7 @@ public class InviteController {
     public ResponseEntity<?> getInviteDetails(
         @PathVariable String inviteId, 
         HttpSession session
-        ) {
+    ) {
         // get the user's email using the session info.
         // get the inviteid of the active invite from the url path
         // get the dto for the quiz (service needs to get the string json from database and parse it into dto)
@@ -64,7 +65,8 @@ public class InviteController {
     public ResponseEntity<?> getInviteDetails(
         @PathVariable(name = "inviteId") String inviteId, 
         @RequestBody QuizSubmissionAnswer quizSubmissionAnswer, 
-        HttpSession session) {
+        HttpSession session
+    ) {
         // Get the user's email from session info.
         // Get the invite id
         // Get the request body as dto
@@ -77,6 +79,20 @@ public class InviteController {
                                                                 quizSubmissionAnswer
                                                             );
         return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/completed")
+    public ResponseEntity<?> getCompletedQuizzes(
+        HttpSession session
+    ) {
+        // get the user email id
+        String userEmail = (String) session.getAttribute("username");
+        // use the service to get the list of submissions from the submissions table
+        // TODO: need to implement pagination
+        List<CompletedQuizzes> completedQuizzes = this.invitesSerivce.getCompletedQuizzes(
+            userEmail
+        );
+        return ResponseEntity.ok(completedQuizzes);
     }
     
 }
