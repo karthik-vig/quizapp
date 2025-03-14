@@ -19,6 +19,8 @@ import com.kvs.app.quizapp.service.HandleUsers;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/login")
 public class LoginController {
@@ -37,7 +39,8 @@ public class LoginController {
     }
 
     @PostMapping("/request")
-    public ResponseEntity<?> loginRequest(@Valid @RequestBody Login login) {
+    public ResponseEntity<Map<String, Object>> loginRequest(@Valid @RequestBody Login login) {
+        HashMap<String, Object> response = new HashMap<>();
         // generate otp
         Random randomNumberGenerator = new Random();
         int otp = randomNumberGenerator.nextInt(100000, 999999);
@@ -47,14 +50,17 @@ public class LoginController {
             emailOtp.put(login.getEmail(), otp);
         }
         // return sucess or failure to frontend
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        response.put("status", "Success");
+        response.put("message", "The OTP has been sent to the email");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/verification")
-    public ResponseEntity<?> startLogin(
+    public ResponseEntity<Map<String, Object>> startLogin(
         @Valid @RequestBody Login login, 
         HttpSession session
         ) {
+        HashMap<String, Object> response = new HashMap<>();
         String email = login.getEmail();
         Integer userOtp = login.getOtp();
         Integer serverOtp = emailOtp.get(email);
@@ -64,8 +70,12 @@ public class LoginController {
             session.setAttribute("username", email);
             emailOtp.remove(email);
             this.handleUsers.createUserIfNotExist(email);
-            return new ResponseEntity<>("Success", HttpStatus.OK);
+            response.put("status", "Success");
+            response.put("message", "The user has been verified");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
-        return new ResponseEntity<>("Authentication Failed", HttpStatus.UNAUTHORIZED);
+        response.put("status", "Error");
+        response.put("message", "Could not verify the user");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
