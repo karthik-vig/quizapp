@@ -1,7 +1,6 @@
 package com.kvs.app.quizapp.controller;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,11 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kvs.app.quizapp.dto.CompletedQuizzes;
-import com.kvs.app.quizapp.dto.QuizInvite;
 import com.kvs.app.quizapp.dto.QuizSubmissionAnswer;
-import com.kvs.app.quizapp.dto.QuizTemplate;
-import com.kvs.app.quizapp.dto.QuestionTemplate.Question;
 import com.kvs.app.quizapp.service.InvitesSerivce;
 
 import jakarta.servlet.http.HttpSession;
@@ -48,10 +43,10 @@ public class InviteController {
             response.put("message", "user is not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        List<QuizInvite> quizInvites = invitesSerivce.getActiveInvites(userEmail);
-        response.put("status", "Success");
-        response.put("data", quizInvites);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) invitesSerivce.getActiveInvites(userEmail);
+        ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responseEntity.body(response);
     }
 
     @GetMapping("/active/{inviteId}")
@@ -71,15 +66,11 @@ public class InviteController {
             response.put("message", "user is not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        QuizTemplate<Question> inviteeQuizTemplate = this.invitesSerivce.getInviteDetails(inviteId, userEmail);
-        if (inviteeQuizTemplate == null) {
-            response.put("status", "Error");
-            response.put("message", "Could not fetch the invite details");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        response.put("status", "Success");
-        response.put("data", inviteeQuizTemplate);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) this.invitesSerivce.getInviteDetails(inviteId, userEmail);
+
+        ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responseEntity.body(response);
     }
 
     @PostMapping("/active/{inviteId}")
@@ -97,23 +88,18 @@ public class InviteController {
         // get the user's email
         String userEmail = (String) session.getAttribute("username");
         if (userEmail == null) {
-            response.put("status", "error");
-            response.put("message", "user is not logged in");
+            response.put("status", "Error");
+            response.put("message", "User is not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        String status = this.invitesSerivce.submiteQuizAnswers(
+        response = (HashMap<String, Object>) this.invitesSerivce.submiteQuizAnswers(
                                                                 userEmail, 
                                                                 inviteId, 
                                                                 quizSubmissionAnswer
                                                             );
-        if (status.equals("Fail")) {
-            response.put("status", "Error");
-            response.put("message", "Could not submit the answers");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        response.put("status", "Success");
-        response.put("message", "Submitted the quiz answers");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responseEntity.body(response);
     }
 
     @GetMapping("/completed")
@@ -130,12 +116,12 @@ public class InviteController {
         }
         // use the service to get the list of submissions from the submissions table
         // TODO: need to implement pagination
-        List<CompletedQuizzes> completedQuizzes = this.invitesSerivce.getCompletedQuizzes(
+        response = (HashMap<String, Object>) this.invitesSerivce.getCompletedQuizzes(
             userEmail
         );
-        response.put("status", "Success");
-        response.put("data", completedQuizzes);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        ResponseEntity.BodyBuilder responsBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBuilder.body(response);
     }
     
 }
