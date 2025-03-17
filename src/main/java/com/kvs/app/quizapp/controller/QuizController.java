@@ -14,7 +14,6 @@ import com.kvs.app.quizapp.dto.NewQuiz;
 import com.kvs.app.quizapp.service.QuizService;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.websocket.server.PathParam;
 
 import java.util.HashMap;
 import java.util.Map;
