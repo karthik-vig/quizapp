@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UsersRepository extends JpaRepository<UsersEntity, String> {
 
-    @Query("SELECT u FROM UsersEntity u WHERE u.email = :email")
+    @Query("SELECT u FROM UsersEntity u WHERE u.email = :email ORDER BY u.updatedat DESC")
     UsersEntity findByEmail(@Param("email") String userEmail);
 
 }

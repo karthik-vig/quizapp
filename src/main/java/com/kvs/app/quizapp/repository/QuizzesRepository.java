@@ -14,9 +14,9 @@ import java.util.List;
 @Repository
 public interface QuizzesRepository extends JpaRepository<QuizzesEntity, String> {  
 
-    @Query("SELECT q FROM QuizzesEntity q WHERE q.id = :id")
+    @Query("SELECT q FROM QuizzesEntity q WHERE q.id = :id ORDER BY q.updatedat DESC")
     QuizzesEntity findByQuizid(@Param("id") String id);
 
-    @Query("SELECT q FROM QuizzesEntity q WHERE q.userid = :userId")
+    @Query("SELECT q FROM QuizzesEntity q WHERE q.userid = :userId ORDER BY q.updatedat DESC")
     List<QuizzesEntity> findByUserId(@Param("userId") String userId);
 }

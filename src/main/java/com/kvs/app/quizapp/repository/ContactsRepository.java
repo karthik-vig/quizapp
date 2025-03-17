@@ -16,10 +16,10 @@ import java.util.List;
 @Repository
 public interface ContactsRepository extends JpaRepository<ContactsEntity, String> {
 
-    @Query("SELECT c FROM ContactsEntity c WHERE c.userid = :userId")
+    @Query("SELECT c FROM ContactsEntity c WHERE c.userid = :userId ORDER BY c.updatedat DESC")
     List<ContactsEntity> getAllContacts(@Param("userId") String userId);
 
-    @Query("SELECT new com.kvs.app.quizapp.dto.Contacts(c.id, u.email) FROM ContactsEntity c JOIN UsersEntity u ON c.relateduserid = u.id WHERE c.userid = :userId")
+    @Query("SELECT new com.kvs.app.quizapp.dto.Contacts(c.id, u.email) FROM ContactsEntity c JOIN UsersEntity u ON c.relateduserid = u.id WHERE c.userid = :userId ORDER BY c.updatedat DESC")
     List<Contacts> getRelatedUserEmailById(@Param("userId") String userId);
 
     @Transactional
@@ -32,7 +32,7 @@ public interface ContactsRepository extends JpaRepository<ContactsEntity, String
     @Query("DELETE FROM ContactsEntity c WHERE c.id = :contactId AND c.userid = :userId")
     int deleteContactByIdAndUserId(@Param("contactId") String contactId, @Param("userId") String userId);
 
-    @Query("SELECT c FROM ContactsEntity c WHERE c.relateduserid = :relatedUserId AND c.userid = :userId")
+    @Query("SELECT c FROM ContactsEntity c WHERE c.relateduserid = :relatedUserId AND c.userid = :userId ORDER BY c.updatedat DESC")
     ContactsEntity findByRelatedUserId(@Param("relatedUserId") String relatedUserId, @Param("userId") String userId);
 
 }

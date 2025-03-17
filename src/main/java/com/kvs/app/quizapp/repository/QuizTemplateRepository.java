@@ -15,10 +15,10 @@ import java.util.List;
 @Repository
 public interface QuizTemplateRepository extends JpaRepository<QuizTemplateEntity, String> {
 
-    @Query("SELECT q FROM QuizTemplateEntity q WHERE q.userid = :userid")
+    @Query("SELECT q FROM QuizTemplateEntity q WHERE q.userid = :userid ORDER BY q.updatedat DESC")
     List<QuizTemplateEntity> findByUserId(@Param("userid") String userId);
 
-    @Query("SELECT q FROM QuizTemplateEntity q WHERE q.userid = :userid AND q.id = :quizTemplateId")
+    @Query("SELECT q FROM QuizTemplateEntity q WHERE q.userid = :userid AND q.id = :quizTemplateId ORDER BY q.updatedat DESC")
     QuizTemplateEntity findByQuizTemplateId(@Param("userid") String userId, @Param("quizTemplateId") String quizTemplateId);
 
     @Transactional

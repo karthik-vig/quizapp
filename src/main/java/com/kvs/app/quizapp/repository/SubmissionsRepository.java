@@ -14,6 +14,6 @@ import jakarta.persistence.Tuple;
 @Repository
 public interface SubmissionsRepository extends JpaRepository<SubmissionsEntity, String> {
 
-    @Query("SELECT s.id AS id, q.quiztitle AS quizTitle FROM SubmissionsEntity s JOIN QuizzesEntity q ON s.quizid = q.id WHERE s.userid = :userid ORDER BY s.createdat DESC")
+    @Query("SELECT s.id AS id, q.quiztitle AS quizTitle FROM SubmissionsEntity s JOIN QuizzesEntity q ON s.quizid = q.id WHERE s.userid = :userid ORDER BY s.updatedat DESC")
     List<Tuple> getQuizIdByUserId(@Param("userid") String userId);
 }
