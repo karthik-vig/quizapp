@@ -3,6 +3,7 @@ package com.kvs.app.quizapp.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -87,6 +88,26 @@ public class QuizController {
         }
         // using the service; get the details about the quiz
         response = (HashMap<String, Object>) this.quizService.getQuizDetail(userEmail, quizId);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
+    }
+
+    @DeleteMapping("/{quizId}")
+    public ResponseEntity<Map<String, Object>> deleteQuiz(
+        @PathVariable("quizId") String quizId,
+        HttpSession session 
+    ) {
+        HashMap<String, Object> response = new HashMap<>();
+        // get the user's email
+        String userEmail = (String) session.getAttribute("username");
+        if (userEmail == null) {
+            response.put("status", "error");
+            response.put("message", "user is not logged in");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        // use the service to delete the quiz
+        response = (HashMap<String, Object>) this.quizService.deleteQuiz(userEmail, quizId);
         ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
         response.remove("statusCode");
         return responsBodyBuilder.body(response);

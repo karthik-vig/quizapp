@@ -139,4 +139,24 @@ public class QuizService {
         return response;
         
     }
+
+    public Map<String, Object> deleteQuiz(
+        String userEmail,
+        String quizId
+    ) {
+        HashMap<String, Object> response = new HashMap<>();
+        UsersEntity usersRow = usersRepository.findByEmail(userEmail);
+        if (usersRow == null) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the user details");
+            response.put("statusCode", HttpStatus.UNAUTHORIZED);
+            return response;
+        }
+        // delete the quiz
+        quizzesRepository.deleteRowByUserIdAndQuizId(usersRow.getId(), quizId);
+        response.put("status", "Success");
+        response.put("message", "Permanently remove the quiz");
+        response.put("statusCode", HttpStatus.OK);
+        return response;
+    }
 }
