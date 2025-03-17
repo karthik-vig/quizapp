@@ -11,12 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.kvs.app.quizapp.dto.NewQuiz;
+import com.kvs.app.quizapp.dto.QuizDetail;
 import com.kvs.app.quizapp.dto.QuizShortform;
 import com.kvs.app.quizapp.entity.InvitesEntity;
 import com.kvs.app.quizapp.entity.QuizTemplateEntity;
 import com.kvs.app.quizapp.entity.QuizzesEntity;
 import com.kvs.app.quizapp.entity.UsersEntity;
 import com.kvs.app.quizapp.mapper.QuizRowAndQuizShortformMapper;
+import com.kvs.app.quizapp.mapper.QuizRowToQuizDetailMapper;
 import com.kvs.app.quizapp.repository.InvitesRepository;
 import com.kvs.app.quizapp.repository.QuizTemplateRepository;
 import com.kvs.app.quizapp.repository.QuizzesRepository;
@@ -107,5 +109,34 @@ public class QuizService {
         response.put("message", "Created the quiz");
         response.put("statusCode", HttpStatus.OK);
         return response;
+    }
+
+    public Map<String, Object> getQuizDetail(
+        String userEmail,
+        String quizId
+    ) {
+        HashMap<String, Object> response = new HashMap<>();
+        UsersEntity usersRow = usersRepository.findByEmail(userEmail);
+        if (usersRow == null) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the user details");
+            response.put("statusCode", HttpStatus.UNAUTHORIZED);
+            return response;
+        }
+        // get the quiz detail
+        QuizzesEntity quizRow = quizzesRepository.getQuizRowByQuizIdAndUserId(usersRow.getId(), quizId);
+        if (quizRow == null) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the quiz details");
+            response.put("statusCode", HttpStatus.NOT_FOUND);
+            return response;
+        }
+        // map the quiz details into an format appropriate for the front-end
+        QuizDetail quizDetail = QuizRowToQuizDetailMapper.toDto(quizRow);
+        response.put("status", "Success");
+        response.put("data", quizDetail); // change the it actual data
+        response.put("statusCode", HttpStatus.OK);
+        return response;
+        
     }
 }

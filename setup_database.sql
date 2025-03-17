@@ -37,7 +37,8 @@ create table if not exists quizzes (
     quiztitle text not null,
     quizdata longtext not null,
     createdat timestamp default current_timestamp,
-    updatedat timestamp on update current_timestamp
+    updatedat timestamp on update current_timestamp,
+    expiration timestamp
 );
 
 create table if not exists invites (

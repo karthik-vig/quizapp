@@ -19,4 +19,7 @@ public interface QuizzesRepository extends JpaRepository<QuizzesEntity, String> 
 
     @Query("SELECT q FROM QuizzesEntity q WHERE q.userid = :userId ORDER BY q.updatedat DESC")
     List<QuizzesEntity> findByUserId(@Param("userId") String userId);
+
+    @Query("SELECT q FROM QuizzesEntity q WHERE q.userid = :userid AND q.id = :quizid")
+    QuizzesEntity getQuizRowByQuizIdAndUserId(@Param("userid") String userId, @Param("quizid") String quizId);
 }

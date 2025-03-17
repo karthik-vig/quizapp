@@ -36,6 +36,9 @@ public class QuizzesEntity {
     @Column( name = "updatedat")
     private LocalDateTime updatedat;
 
+    @Column( name = "expiration")
+    private LocalDateTime expiration;
+
     public String getId() {
         return id;
     }
@@ -84,5 +87,12 @@ public class QuizzesEntity {
         this.updatedat = updatedat;
     }
 
+    public LocalDateTime getExpiration() {
+        return this.expiration;
+    }
+
+    public void setExpiration(LocalDateTime expiration) {
+        this.expiration = expiration;
+    }
     
 }
