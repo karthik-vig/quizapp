@@ -93,7 +93,7 @@ public class QuizTemplateService {
         quizTemplateEntity.setQuiztemplate(quizTemplateJson);
         this.quizTemplateRepository.save(quizTemplateEntity);
         response.put("status", "Success");
-        response.put("message", "Creaeted a quiz template with given infromation");
+        response.put("message", "Created a quiz template with given information");
         response.put("statusCode", HttpStatus.OK);
         return response;
     }
