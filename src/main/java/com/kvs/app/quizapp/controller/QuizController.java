@@ -44,9 +44,10 @@ public class QuizController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         // the service fetches all the quiz's id and title and returns it
-        response.put("status", "Success");
-        response.put("data", quizService.getAllQuiz(userEmail));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) quizService.getAllQuiz(userEmail);
+        ResponseEntity.BodyBuilder responBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responBodyBuilder.body(response);
     }
 
     @PostMapping("/")
@@ -64,9 +65,9 @@ public class QuizController {
         }
         // the service needs to create the quiz in the quiz table, as well as put them in 
         // the invites table
-        quizService.createQuiz(userEmail, newQuiz);
-        response.put("status", "Success");
-        response.put("message", "Created the quiz");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) quizService.createQuiz(userEmail, newQuiz);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
     }
 }

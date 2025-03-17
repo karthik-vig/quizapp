@@ -48,9 +48,10 @@ public class QuizTemplateController {
         }
         // service needs to query and get list of all quiz template id and name and return it as a dto
         // return the List<dto>
-        response.put("status", "Success");
-        response.put("data", quizTemplateService.getQuizTemplates(userEmail));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) quizTemplateService.getQuizTemplates(userEmail);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
     }
 
     @PostMapping("/")
@@ -67,15 +68,10 @@ public class QuizTemplateController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         // System.out.println("the user's email when creating quiz template is: " + userEmail);
-        String status = this.quizTemplateService.createNewQuizTemplate(quizTemplate, userEmail);
-        if (status.equals("Fail")) {
-            response.put("status", "Error");
-            response.put("message", "Could not create the quiz template");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
-        }
-        response.put("status", "Success");
-        response.put("message", status);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) this.quizTemplateService.createNewQuizTemplate(quizTemplate, userEmail);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
     }
 
     @GetMapping("/{quizTemplateId}")
@@ -92,9 +88,10 @@ public class QuizTemplateController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         // service returns the dto of the request json of the respective quizTemplateId
-        response.put("status", "Success");
-        response.put("data", this.quizTemplateService.getQuizTemplate(userEmail, quizTemplateId));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) this.quizTemplateService.getQuizTemplate(userEmail, quizTemplateId);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
     }
 
     @PutMapping("/{quizTemplateId}")
@@ -112,15 +109,10 @@ public class QuizTemplateController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         // use the quiz template service to replace the existing json data and quiz template title
-        String status = this.quizTemplateService.modifyQuizTemplate(userEmail, quizTemplateId, quizTemplate);
-        if (status.equals("Fail")) {
-            response.put("status", "Error");
-            response.put("message", "Could not modify the given quiz template");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        response.put("status", "Success");
-        response.put("message", "Modified the qiven quiz template");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) this.quizTemplateService.modifyQuizTemplate(userEmail, quizTemplateId, quizTemplate);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
     }
 
     @DeleteMapping("/{quizTemplateId}")
@@ -137,15 +129,10 @@ public class QuizTemplateController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         // the quiz template service needs to delete the row for the respective id
-        String status = this.quizTemplateService.deleteQuizTemplate(userEmail, quizTemplateId);
-        if (status.equals("Fail")) {
-            response.put("status", "Error");
-            response.put("message", "Could not complete the delete operation");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        response.put("status", "Success");
-        response.put("message", "Deleted the given quiz template");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) this.quizTemplateService.deleteQuizTemplate(userEmail, quizTemplateId);
+        ResponseEntity.BodyBuilder responsBodyBuilder = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responsBodyBuilder.body(response);
     }
     
 }

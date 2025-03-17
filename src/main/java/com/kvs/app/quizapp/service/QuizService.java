@@ -3,8 +3,11 @@ package com.kvs.app.quizapp.service;
 import java.util.Vector;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.kvs.app.quizapp.dto.NewQuiz;
@@ -40,25 +43,46 @@ public class QuizService {
         this.invitesRepository = invitesRepository;
     }
 
-    public List<QuizShortform> getAllQuiz(String userEmail) {
+    public Map<String, Object> getAllQuiz(String userEmail) {
+        HashMap<String, Object> response = new HashMap<>();
         List<QuizShortform> quizShortforms = new Vector<>();
         UsersEntity usersRow = usersRepository.findByEmail(userEmail);
-        if (usersRow == null) return quizShortforms;
+        if (usersRow == null) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the user details");
+            response.put("statusCode", HttpStatus.UNAUTHORIZED);
+            return response;
+        }
         List<QuizzesEntity> quizzesEntities = quizzesRepository.findByUserId(usersRow.getId());
         for (QuizzesEntity quizzesEntity: quizzesEntities) {
             quizShortforms.add(QuizRowAndQuizShortformMapper.toDTO(quizzesEntity));
         }
-        return quizShortforms;
+        response.put("status", "Success");
+        response.put("data", quizShortforms);
+        response.put("statusCode", HttpStatus.OK);
+        return response;
     }
 
-    public String createQuiz(
+    public Map<String, Object> createQuiz(
         String userEmail, 
         NewQuiz newQuiz
     ) {
+        HashMap<String, Object> response = new HashMap<>();
         UsersEntity usersRow = usersRepository.findByEmail(userEmail);
-        if (usersRow == null) return "Fail";
+        if (usersRow == null) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the user details");
+            response.put("statusCode", HttpStatus.UNAUTHORIZED);
+            return response;
+        }
         // get the quiz data from the quiz template table
-        QuizTemplateEntity quizTemplateEntity = quizTemplateRepository.findByQuizTemplateId(newQuiz.getQuizTemplateId());
+        QuizTemplateEntity quizTemplateEntity = quizTemplateRepository.findByQuizTemplateId(usersRow.getId(), newQuiz.getQuizTemplateId());
+        if (quizTemplateEntity == null) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the quiz template");
+            response.put("statusCode", HttpStatus.NOT_FOUND);
+            return response;
+        }
         // put the quiz in the quizzes table
         QuizzesEntity quizzesEntity = new QuizzesEntity();
         String uuid = UUID.randomUUID().toString();
@@ -79,6 +103,9 @@ public class QuizService {
             invitesEntity.setUserid(contactUsersRow.getId());
             invitesRepository.save(invitesEntity);
         }
-        return "Success";
+        response.put("status", "Success");
+        response.put("message", "Created the quiz");
+        response.put("statusCode", HttpStatus.OK);
+        return response;
     }
 }

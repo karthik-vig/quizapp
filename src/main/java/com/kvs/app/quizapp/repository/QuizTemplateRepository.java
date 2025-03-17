@@ -18,18 +18,18 @@ public interface QuizTemplateRepository extends JpaRepository<QuizTemplateEntity
     @Query("SELECT q FROM QuizTemplateEntity q WHERE q.userid = :userid")
     List<QuizTemplateEntity> findByUserId(@Param("userid") String userId);
 
-    @Query("SELECT q FROM QuizTemplateEntity q WHERE q.id = :quizTemplateId")
-    QuizTemplateEntity findByQuizTemplateId(@Param("quizTemplateId") String quizTemplateId);
+    @Query("SELECT q FROM QuizTemplateEntity q WHERE q.userid = :userid AND q.id = :quizTemplateId")
+    QuizTemplateEntity findByQuizTemplateId(@Param("userid") String userId, @Param("quizTemplateId") String quizTemplateId);
 
     @Transactional
     @Modifying
-    @Query("UPDATE QuizTemplateEntity q SET q.quiztemplatetitle = :quizTemplateTitle WHERE q.id = :quizTemplateId")
-    int updateQuizTemplateTitle(@Param("quizTemplateTitle") String quizTemplateTitle, @Param("quizTemplateId") String quizTemplateId);
+    @Query("UPDATE QuizTemplateEntity q SET q.quiztemplatetitle = :quizTemplateTitle WHERE q.userid = :userid AND q.id = :quizTemplateId")
+    int updateQuizTemplateTitle(@Param("userid") String userId, @Param("quizTemplateTitle") String quizTemplateTitle, @Param("quizTemplateId") String quizTemplateId);
 
     @Transactional
     @Modifying
-    @Query("UPDATE QuizTemplateEntity q SET q.quiztemplate = :quizTemplateJson WHERE q.id = :quizTemplateId")
-    int updateQuizTemplateJson(@Param("quizTemplateJson") String quizTemplateJson, @Param("quizTemplateId") String quizTemplateId);
+    @Query("UPDATE QuizTemplateEntity q SET q.quiztemplate = :quizTemplateJson WHERE q.userid = :userid AND q.id = :quizTemplateId")
+    int updateQuizTemplateJson(@Param("userid") String userId, @Param("quizTemplateJson") String quizTemplateJson, @Param("quizTemplateId") String quizTemplateId);
 
     @Transactional
     @Modifying
