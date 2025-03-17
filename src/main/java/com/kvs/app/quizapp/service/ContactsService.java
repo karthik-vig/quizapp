@@ -1,11 +1,13 @@
 package com.kvs.app.quizapp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.Vector;
+import java.util.Map;
 
 import com.kvs.app.quizapp.repository.ContactsRepository;
 import com.kvs.app.quizapp.repository.UsersRepository;
@@ -30,12 +32,20 @@ public class ContactsService {
         this.contactsRepository = contactsRepository;
     }
 
-    public List<Contacts> getAllContacts(String userEmail) {
-        List<Contacts> emptyList = new Vector<>();
+    public Map<String, Object> getAllContacts(String userEmail) {
+        HashMap<String, Object> response = new HashMap<>();
         UsersEntity usersRow = this.usersRepository.findByEmail(userEmail);
-        if ( usersRow == null ) return emptyList;
+        if ( usersRow == null ) {
+            response.put("status", "Error");
+            response.put("message", "Could not fetch the user details");
+            response.put("statusCode", HttpStatus.UNAUTHORIZED);
+            return response;
+        }
         List<Contacts> contacts = this.contactsRepository.getRelatedUserEmailById(usersRow.getId());
-        return contacts;
+        response.put("status", "Success");
+        response.put("data", contacts);
+        response.put("statusCode", HttpStatus.OK);
+        return response;
     }
 
     private String createUserIfNotExist(NewContact newContact) {

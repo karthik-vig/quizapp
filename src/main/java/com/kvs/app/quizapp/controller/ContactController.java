@@ -1,7 +1,6 @@
 package com.kvs.app.quizapp.controller;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kvs.app.quizapp.dto.Contacts;
 import com.kvs.app.quizapp.dto.NewContact;
 import com.kvs.app.quizapp.service.ContactsService;
 
@@ -50,10 +48,10 @@ public class ContactController {
         // service to fetch all the contacts the user has
         // the service uses uses the useremail to get the userid
         // then uses the userid to fetch all the contacts and return it
-        List<Contacts> contacts = this.contactsService.getAllContacts(userEmail);
-        response.put("status", "Success");
-        response.put("data", contacts);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response = (HashMap<String, Object>) this.contactsService.getAllContacts(userEmail);
+        ResponseEntity.BodyBuilder responseEntity = ResponseEntity.status((HttpStatus) response.get("statusCode"));
+        response.remove("statusCode");
+        return responseEntity.body(response);
     }
 
     @PostMapping("/")
