@@ -16,4 +16,8 @@ public interface SubmissionsRepository extends JpaRepository<SubmissionsEntity, 
 
     @Query("SELECT s.id AS id, q.quiztitle AS quizTitle FROM SubmissionsEntity s JOIN QuizzesEntity q ON s.quizid = q.id WHERE s.userid = :userid ORDER BY s.updatedat DESC")
     List<Tuple> getQuizIdByUserId(@Param("userid") String userId);
+
+    @Query("SELECT s, q FROM SubmissionsEntity s JOIN QuizzesEntity q ON s.quizid = q.id WHERE q.userid = :userid ORDER BY s.updatedat DESC")
+    List<Tuple> getSubmissionsForQuizOwner(@Param("userid") String userId);
+
 }
