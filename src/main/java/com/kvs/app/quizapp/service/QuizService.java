@@ -2,8 +2,9 @@ package com.kvs.app.quizapp.service;
 
 import java.util.Vector;
 import java.util.List;
-import java.util.UUID;
+// import java.util.UUID;
 import java.util.Map;
+// import java.util.UUID;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.kvs.app.quizapp.entity.InvitesEntity;
 import com.kvs.app.quizapp.entity.QuizTemplateEntity;
 import com.kvs.app.quizapp.entity.QuizzesEntity;
 import com.kvs.app.quizapp.entity.UsersEntity;
+import com.kvs.app.quizapp.helpers.ULIDGenerator;
 import com.kvs.app.quizapp.mapper.QuizRowAndQuizShortformMapper;
 import com.kvs.app.quizapp.mapper.QuizRowToQuizDetailMapper;
 import com.kvs.app.quizapp.repository.InvitesRepository;
@@ -87,7 +89,8 @@ public class QuizService {
         }
         // put the quiz in the quizzes table
         QuizzesEntity quizzesEntity = new QuizzesEntity();
-        String uuid = UUID.randomUUID().toString();
+        // String uuid = UUID.randomUUID().toString();
+        String uuid = ULIDGenerator.getULID();
         quizzesEntity.setId(uuid);
         quizzesEntity.setQuiztitle(newQuiz.getQuizTitle());
         quizzesEntity.setUserid(usersRow.getId());
@@ -98,7 +101,8 @@ public class QuizService {
         for (String email: newQuiz.getEmails()) {
             UsersEntity contactUsersRow = usersRepository.findByEmail(email);
             InvitesEntity invitesEntity = new InvitesEntity();
-            String invitesUUID = UUID.randomUUID().toString();
+            // String invitesUUID = UUID.randomUUID().toString();
+            String invitesUUID = ULIDGenerator.getULID();
             invitesEntity.setId(invitesUUID);
             invitesEntity.setInvitestatus(true);
             invitesEntity.setQuizid(uuid);

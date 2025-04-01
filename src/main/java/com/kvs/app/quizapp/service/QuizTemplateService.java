@@ -9,6 +9,7 @@ import com.kvs.app.quizapp.dto.QuestionTemplate.QuestionAndAnswer;
 import com.kvs.app.quizapp.dto.QuizTemplateListDTO;
 import com.kvs.app.quizapp.entity.QuizTemplateEntity;
 import com.kvs.app.quizapp.entity.UsersEntity;
+import com.kvs.app.quizapp.helpers.ULIDGenerator;
 import com.kvs.app.quizapp.repository.UsersRepository;
 import com.kvs.app.quizapp.repository.QuizTemplateRepository;
 import com.kvs.app.quizapp.mapper.QuizTemplateListMapper;
@@ -17,7 +18,7 @@ import com.kvs.app.quizapp.mapper.QuizTemplateMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import java.util.UUID;
+// import java.util.UUID;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -87,7 +88,8 @@ public class QuizTemplateService {
         // map the dto to the entity
         QuizTemplateEntity quizTemplateEntity = QuizTemplateMapper.toEntity(quizTemplate);
         // generate random uuidv4 and insert the enitty into the table
-        String uuid = UUID.randomUUID().toString();
+        // String uuid = UUID.randomUUID().toString();
+        String uuid = ULIDGenerator.getULID();
         quizTemplateEntity.setId(uuid);
         quizTemplateEntity.setUserid(usersRow.getId());
         quizTemplateEntity.setQuiztemplate(quizTemplateJson);

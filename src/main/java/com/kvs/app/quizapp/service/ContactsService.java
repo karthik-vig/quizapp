@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+// import java.util.UUID;
 import java.util.Map;
+import com.kvs.app.quizapp.helpers.ULIDGenerator;
 
 import com.kvs.app.quizapp.repository.ContactsRepository;
 import com.kvs.app.quizapp.repository.UsersRepository;
@@ -54,7 +55,8 @@ public class ContactsService {
         if ( relatedUsersRow == null ) {
             UsersEntity newUsersEntity = new UsersEntity();
             newUsersEntity.setEmail(newContact.getEmail());
-            String uuid = UUID.randomUUID().toString();
+            // String uuid = UUID.randomUUID().toString();
+            String uuid = ULIDGenerator.getULID();
             newUsersEntity.setId(uuid);
             UsersEntity newUsersRow = this.usersRepository.save(newUsersEntity);
             relatedUserId = newUsersRow.getId();
@@ -78,7 +80,8 @@ public class ContactsService {
         ContactsEntity existingContactsRow = contactsRepository.findByRelatedUserId(relatedUserId, usersRow.getId());
         if (existingContactsRow != null) return "Duplicate";
         ContactsEntity contactsEntity = new ContactsEntity();
-        String uuid = UUID.randomUUID().toString();
+        // String uuid = UUID.randomUUID().toString();
+        String uuid = ULIDGenerator.getULID();
         contactsEntity.setId(uuid);
         contactsEntity.setUserid(usersRow.getId());
         contactsEntity.setRelateduserid(relatedUserId);
