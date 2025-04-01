@@ -15,14 +15,12 @@ public class ULIDGenerator {
     // in the next round first shift in the unused bit, 
     // only after it use bits from the remaining  space from 
     // current byte.
-    public static String encodeBase32(byte[] values) {
+    private static String encodeBytesAsBase32(byte[] values) {
         int bitSelector = 5;
         int current = 0;
         StringBuilder result = new StringBuilder("");
         for (byte val : values) {
             current += (int) ((int) (val >> (8 - bitSelector)) & 0xFF);
-            // System.out.println("First spot: " + Integer.toString(current));
-            // System.out.println(BASE32_ALPHABET.charAt(current));
             result.append(BASE32_ALPHABET.charAt(current));
             current = (int) (((int) val << bitSelector) & 0xFF);
             current = (int) (((int) current >> 3) & 0xFF);
@@ -31,9 +29,6 @@ public class ULIDGenerator {
                 bitSelector = 5 - (8 - bitSelector);
                 continue;
             }
-            // current = (int) ((int) (current >> 3) & 0xFF);
-            // System.out.println("Second spot: " + Integer.toString(current));
-            // System.out.println(BASE32_ALPHABET.charAt(current));
             result.append(BASE32_ALPHABET.charAt(current));
             bitSelector = 8 - 5 - bitSelector;
             current = (int) (((int) val << (8 - bitSelector)) & 0xFF);
@@ -45,15 +40,36 @@ public class ULIDGenerator {
         }
         return result.toString();
     }
+
+    private static String encodeLongAsBase32(long timestamp) {
+        long timestamp48bits = timestamp & 0xFFFFFFFFFFFFL;
+        long current = 0;
+        final int selectedBits = 5;
+        int totalBits = 48;
+        StringBuilder result = new StringBuilder("");
+        while (totalBits >= selectedBits) {
+            current = (long) ( (long) ( timestamp48bits >> (totalBits - selectedBits) ));
+            current = current & 0x1F; // extract selected bits using a mask, i.e., the last 5 bits
+            result.append(BASE32_ALPHABET.charAt((int)current));
+            totalBits -= selectedBits;
+        }
+        if (totalBits < selectedBits && totalBits > 0) {
+            current = timestamp48bits & 0x07; // extract last 3 bits
+            current = current << 2; // move 2 positions to the left, so that it is 5 bits now
+            result.append(BASE32_ALPHABET.charAt((int)current));
+        }
+        return result.toString();
+    }
     
     public static String getULID() {
         StringBuilder secureValue = new StringBuilder("");
-        String currentTimestampMilliSecond = Long.toString(Instant.now().toEpochMilli()); // current utc timestamp; the first 48 bits
+        long currentTimestampMilliSecond = Instant.now().toEpochMilli(); // current utc timestamp; the first 48 bits
         // secureValue += currentTimestampMilliSecond;
         byte[] tempSecureRandomValues = new byte[10];
         SecureRandom generateSecureRandomValue = new SecureRandom();
         generateSecureRandomValue.nextBytes(tempSecureRandomValues); // the secure and randomly generated 80 bits
-        secureValue.append(encodeBase32(tempSecureRandomValues));
+        secureValue.append(encodeLongAsBase32(currentTimestampMilliSecond));
+        secureValue.append(encodeBytesAsBase32(tempSecureRandomValues));
         return secureValue.toString();
     }
 }
